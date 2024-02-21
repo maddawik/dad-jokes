@@ -12,11 +12,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+// Create a Client to a MongoDB server and use Ping to verify that the
+// server is running.
 func testDB() {
-	// Create a Client to a MongoDB server and use Ping to verify that the
-	// server is running.
 	mongodb_uri := os.Getenv("MONGODB_URI")
-	clientOpts := options.Client().ApplyURI(mongodb_uri)
+	mongodb_username := os.Getenv("MONGODB_USERNAME")
+	mongodb_password := os.Getenv("MONGODB_PASSWORD")
+
+	clientCredential := options.Credential{
+		Username: mongodb_username,
+		Password: mongodb_password,
+	}
+	clientOpts := options.Client().ApplyURI(mongodb_uri).SetAuth(clientCredential)
 
 	client, err := mongo.Connect(context.TODO(), clientOpts)
 	if err != nil {
@@ -36,6 +43,12 @@ func testDB() {
 		log.Fatal(err)
 	}
 
+	if err != nil {
+		log.Fatalf("Couldn't connect to the database, %v\n", err)
+	} else {
+		fmt.Println("Database is up!")
+	}
+
 	// Get all databases and list them
 	result, err := client.ListDatabaseNames(
 		context.TODO(),
@@ -44,13 +57,8 @@ func testDB() {
 		log.Fatal(err)
 	}
 
+	fmt.Println("All Databases")
 	for _, db := range result {
 		fmt.Println(db)
-	}
-
-	if err != nil {
-		log.Fatalf("Couldn't connect to the database, %v\n", err)
-	} else {
-		fmt.Println("Database is up!")
 	}
 }
