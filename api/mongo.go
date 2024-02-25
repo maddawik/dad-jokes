@@ -2,63 +2,54 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"log"
-	"os"
+	"net/http"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-// Create a Client to a MongoDB server and use Ping to verify that the
-// server is running.
-func testDB() {
-	mongodb_uri := os.Getenv("MONGODB_URI")
-	mongodb_username := os.Getenv("MONGODB_USERNAME")
-	mongodb_password := os.Getenv("MONGODB_PASSWORD")
+type DadJokesWorker struct {
+	client *mongo.Client
+}
 
-	clientCredential := options.Credential{
-		Username: mongodb_username,
-		Password: mongodb_password,
+func NewDadJokesWorker(c *mongo.Client) *DadJokesWorker {
+	return &DadJokesWorker{
+		client: c,
 	}
-	clientOpts := options.Client().ApplyURI(mongodb_uri).SetAuth(clientCredential)
+}
 
-	client, err := mongo.Connect(context.TODO(), clientOpts)
+func (djw *DadJokesWorker) start() error {
+	coll := djw.client.Database("dadjokes").Collection("jokes")
+	ticker := time.NewTicker(10 * time.Second)
+
+	req, err := http.NewRequest("GET", "https://icanhazdadjoke.com/", nil)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
-			log.Fatal(err)
+
+	req.Header.Set("Accept", "application/json")
+	client := &http.Client{}
+
+	for {
+		resp, err := client.Do(req)
+		if err != nil {
+			return err
 		}
-	}()
+		dadJoke := bson.M{}
 
-	// Call Ping to verify that the deployment is up and the Client was
-	// configured successfully. As mentioned in the Ping documentation, this
-	// reduces application resiliency as the server may be temporarily
-	// unavailable when Ping is called.
-	if err = client.Ping(context.TODO(), readpref.Primary()); err != nil {
-		log.Fatal(err)
-	}
+		if err := json.NewDecoder(resp.Body).Decode(&dadJoke); err != nil {
+			return err
+		}
 
-	if err != nil {
-		log.Fatalf("Couldn't connect to the database, %v\n", err)
-	} else {
-		fmt.Println("Database is up!")
-	}
+		_, err = coll.InsertOne(context.TODO(), dadJoke)
+		if err != nil {
+			return err
+		}
 
-	// Get all databases and list them
-	result, err := client.ListDatabaseNames(
-		context.TODO(),
-		bson.D{{"empty", false}})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("All Databases")
-	for _, db := range result {
-		fmt.Println(db)
+		fmt.Println(dadJoke)
+		<-ticker.C
 	}
 }
