@@ -1,21 +1,6 @@
 # https://docs.docker.com/go/compose-spec-reference/
 # https://github.com/docker/awesome-compose
 services:
-  api:
-    build:
-      context: ./api/.
-      target: final
-    depends_on:
-      - "mongo"
-    ports:
-      - 6969:6969
-    environment:
-      MONGODB_URI: mongodb://mongo:27017
-    develop:
-      watch:
-        - action: rebuild
-          path: ./api/
-
   mongo:
     image: mongo
     restart: always
@@ -34,3 +19,31 @@ services:
   #     ME_CONFIG_MONGODB_ADMINUSERNAME: root
   #     ME_CONFIG_MONGODB_ADMINPASSWORD: example
   #     ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+
+  api:
+    build:
+      context: ./api/.
+      target: final
+    depends_on:
+      - "mongo"
+    ports:
+      - 6969:6969
+    environment:
+      MONGODB_URI: mongodb://mongo:27017
+    develop:
+      watch:
+        - action: rebuild
+          path: ./api/
+
+  collector:
+    build:
+      context: ./collector/.
+      target: final
+    depends_on:
+      - "api"
+    environment:
+      MONGODB_URI: mongodb://mongo:27017
+    develop:
+      watch:
+        - action: rebuild
+          path: ./collector/
