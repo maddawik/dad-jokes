@@ -1,0 +1,13 @@
+### Get all albums
+GET http://localhost:8080/albums
+
+### Get album by id
+GET http://localhost:8080/albums/5
+
+### Insert an album
+POST http://localhost:8080/albums
+Content-Type: application/json
+
+{
+  "id": "5","title": "Test","artist": "Things","price": 20.00
+}

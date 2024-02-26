@@ -1,8 +1,13 @@
 # Get all jokes
 GET http://localhost:6969/jokes
 
-# Get a specific joke by id
-# GET http://localhost:6969/jokes/id
-
 # Add a joke
-# POST http://localhost:6969/jokes?joke=idk
+# POST http://localhost:6969/jokes
+#
+# {
+#   "id" : "abc123",
+#   "joke" : "knock knock; who's there? idk."
+# }
+
+# Get a specific joke by id
+# GET http://localhost:6969/jokes/12345
