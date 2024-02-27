@@ -23,6 +23,27 @@ func NewServer(c *mongo.Client) *Server {
 	}
 }
 
+func main() {
+	mongodb_uri := os.Getenv("MONGODB_URI")
+	clientOpts := options.Client().ApplyURI(mongodb_uri)
+	client, err := mongo.Connect(context.TODO(), clientOpts)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err = client.Disconnect(context.TODO()); err != nil {
+			log.Fatal(err)
+		}
+	}()
+	server := NewServer(client)
+
+	router := gin.Default()
+	router.GET("/jokes", server.getJokes)
+	router.GET("/jokes/:id", server.getJokeByID)
+	router.POST("/jokes", server.postJoke)
+	router.Run(":8080")
+}
+
 func (s *Server) getJokeByID(c *gin.Context) {
 	id := c.Param("id")
 	coll := s.client.Database("dadjokes").Collection("jokes")
@@ -70,25 +91,4 @@ func (s *Server) getJokes(c *gin.Context) {
 		log.Fatal(err)
 	}
 	c.IndentedJSON(http.StatusOK, results)
-}
-
-func main() {
-	mongodb_uri := os.Getenv("MONGODB_URI")
-	clientOpts := options.Client().ApplyURI(mongodb_uri)
-	client, err := mongo.Connect(context.TODO(), clientOpts)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
-			log.Fatal(err)
-		}
-	}()
-	server := NewServer(client)
-
-	router := gin.Default()
-	router.GET("/jokes", server.getJokes)
-	router.GET("/jokes/:id", server.getJokeByID)
-	router.POST("/jokes", server.postJoke)
-	router.Run(":8080")
 }
