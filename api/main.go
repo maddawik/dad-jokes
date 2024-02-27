@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -34,7 +33,7 @@ func (s *Server) getJokeByID(c *gin.Context) {
 		// ErrNoDocuments means that the filter did not match any documents in
 		// the collection.
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			fmt.Println(err)
+			c.IndentedJSON(http.StatusNotFound, bson.M{"message": "no result"})
 			return
 		}
 		log.Fatal(err)
