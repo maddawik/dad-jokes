@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -26,7 +25,7 @@ func NewDadJokesWorker(c *mongo.Client) *DadJokesWorker {
 
 func (djw *DadJokesWorker) start() {
 	coll := djw.client.Database("dadjokes").Collection("jokes")
-	ticker := time.NewTicker(10 * time.Second)
+	// ticker := time.NewTicker(10 * time.Second)
 
 	req, err := http.NewRequest("GET", "https://icanhazdadjoke.com/", nil)
 	if err != nil {
@@ -36,25 +35,25 @@ func (djw *DadJokesWorker) start() {
 	req.Header.Set("Accept", "application/json")
 	client := &http.Client{}
 
-	for {
-		resp, err := client.Do(req)
-		if err != nil {
-			log.Fatal(err)
-		}
-		dadJoke := bson.M{}
-
-		if err := json.NewDecoder(resp.Body).Decode(&dadJoke); err != nil {
-			log.Fatal(err)
-		}
-
-		_, err = coll.InsertOne(context.TODO(), dadJoke)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		fmt.Printf("%v\n\n", dadJoke["joke"])
-		<-ticker.C
+	// for {
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
 	}
+	dadJoke := bson.M{}
+
+	if err := json.NewDecoder(resp.Body).Decode(&dadJoke); err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = coll.InsertOne(context.TODO(), dadJoke)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%v\n\n", dadJoke["joke"])
+	// 	<-ticker.C
+	// }
 }
 
 func main() {

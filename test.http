@@ -1,13 +1,14 @@
 # Get all jokes
-GET http://localhost:6969/jokes
+GET http://localhost:8080/jokes
 
 # Add a joke
-# POST http://localhost:6969/jokes
-#
-# {
-#   "id" : "abc123",
-#   "joke" : "knock knock; who's there? idk."
-# }
+POST http://localhost:8080/jokes
+Content-Type: application/json
 
-# Get the latest joke
-GET http://localhost:6969/joke
+{
+  "id" : "abc123",
+  "joke" : "knock knock; who's there? idk."
+}
+
+# Get joke by id
+GET http://localhost:8080/jokes/abc123
