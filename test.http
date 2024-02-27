@@ -9,5 +9,5 @@ GET http://localhost:6969/jokes
 #   "joke" : "knock knock; who's there? idk."
 # }
 
-# Get a specific joke by id
-# GET http://localhost:6969/jokes/12345
+# Get the latest joke
+GET http://localhost:6969/joke
