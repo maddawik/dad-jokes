@@ -6,9 +6,9 @@ POST http://localhost:8080/jokes
 Content-Type: application/json
 
 {
-  "id" : "abc123",
-  "joke" : "knock knock; who's there? idk."
+  "id" : "lol",
+  "joke" : "Your mom 😎"
 }
 
 # Get joke by id
-GET http://localhost:8080/jokes/abc123
+GET http://localhost:8080/jokes/lol
