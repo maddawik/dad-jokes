@@ -1,73 +1,67 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"net/http/httputil"
 )
 
 type DadJokesWorker struct {
-	client *mongo.Client
+	client *http.Client
 }
 
-func NewDadJokesWorker(c *mongo.Client) *DadJokesWorker {
+func NewDadJokesWorker(c *http.Client) *DadJokesWorker {
 	return &DadJokesWorker{
 		client: c,
 	}
 }
 
 func main() {
-	mongodb_uri := os.Getenv("MONGODB_URI")
-	clientOpts := options.Client().ApplyURI(mongodb_uri)
-	client, err := mongo.Connect(context.TODO(), clientOpts)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
-			log.Fatal(err)
-		}
-	}()
+	client := &http.Client{}
 	worker := NewDadJokesWorker(client)
 	worker.start()
 }
 
 func (djw *DadJokesWorker) start() {
-	coll := djw.client.Database("dadjokes").Collection("jokes")
-	// ticker := time.NewTicker(10 * time.Second)
-
-	req, err := http.NewRequest("GET", "https://icanhazdadjoke.com/", nil)
+	// Get joke from icanhazdadjoke
+	jokeReq, err := http.NewRequest("GET", "https://icanhazdadjoke.com/", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	req.Header.Set("Accept", "application/json")
-	client := &http.Client{}
+	jokeReq.Header.Set("Accept", "application/json")
 
-	// for {
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	dadJoke := bson.M{}
-
-	if err := json.NewDecoder(resp.Body).Decode(&dadJoke); err != nil {
-		log.Fatal(err)
-	}
-
-	_, err = coll.InsertOne(context.TODO(), dadJoke)
+	jokeResp, err := djw.client.Do(jokeReq)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("%v\n\n", dadJoke["joke"])
-	// 	<-ticker.C
-	// }
+	jokeB, err := httputil.DumpResponse(jokeResp, true)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println("-----------Joke Response------------")
+	fmt.Println(string(jokeB))
+
+	// Insert into local jokes database via API
+	apiReq, err := http.NewRequest("POST", "http://api:8080/jokes", jokeResp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	apiReq.Header.Set("Content-Type", "application/json")
+
+	apiResp, err := djw.client.Do(apiReq)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer apiResp.Body.Close()
+
+	// Print out the response from the API
+	apiB, err := httputil.DumpResponse(apiResp, true)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("-----------API Response-------------")
+	fmt.Println(string(apiB))
 }

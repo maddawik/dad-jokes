@@ -73,7 +73,7 @@ func (s *Server) postJoke(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	c.IndentedJSON(http.StatusOK, bson.M{"_id": res.InsertedID})
+	c.JSON(http.StatusOK, bson.M{"_id": res.InsertedID})
 }
 
 func (s *Server) getJokes(c *gin.Context) {
