@@ -1,3 +1,4 @@
+// Main entry point for API
 package main
 
 import (
@@ -13,10 +14,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// Server The API Server that receives requests. Must be associated with a
+// mongo client
 type Server struct {
 	client *mongo.Client
 }
 
+// NewServer Create a new api server attached to a mongo client
 func NewServer(c *mongo.Client) *Server {
 	return &Server{
 		client: c,
@@ -24,8 +28,8 @@ func NewServer(c *mongo.Client) *Server {
 }
 
 func main() {
-	mongodb_uri := os.Getenv("MONGODB_URI")
-	clientOpts := options.Client().ApplyURI(mongodb_uri)
+	mongodbURI := os.Getenv("MONGODB_URI")
+	clientOpts := options.Client().ApplyURI(mongodbURI)
 	client, err := mongo.Connect(context.TODO(), clientOpts)
 	if err != nil {
 		log.Fatal(err)
@@ -73,13 +77,14 @@ func (s *Server) postJoke(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	c.JSON(http.StatusOK, bson.M{"_id": res.InsertedID})
+	c.IndentedJSON(http.StatusOK, bson.M{"_id": res.InsertedID})
 }
 
 func (s *Server) getJokes(c *gin.Context) {
 	coll := s.client.Database("dadjokes").Collection("jokes")
+	opts := options.Find().SetSort(bson.D{{"_id", -1}})
 
-	cursor, err := coll.Find(context.TODO(), bson.M{})
+	cursor, err := coll.Find(context.TODO(), bson.M{}, opts)
 	if err != nil {
 		log.Fatal(err)
 	}

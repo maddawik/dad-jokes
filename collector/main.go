@@ -1,3 +1,4 @@
+// Collectors for the dad joke inventory
 package main
 
 import (
@@ -7,10 +8,12 @@ import (
 	"net/http/httputil"
 )
 
+// DadJokesWorker worker bee for collection dad jokes
 type DadJokesWorker struct {
 	client *http.Client
 }
 
+// NewDadJokesWorker Creates a new DadJokesWorker
 func NewDadJokesWorker(c *http.Client) *DadJokesWorker {
 	return &DadJokesWorker{
 		client: c,

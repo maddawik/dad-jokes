@@ -47,3 +47,17 @@ services:
       watch:
         - action: rebuild
           path: ./collector/
+
+  # ui:
+  #   build:
+  #     context: ./ui/.
+  #     target: final
+  #   depends_on:
+  #     - "api"
+  #   command: serve
+  #   ports:
+  #     - 1313:1313
+  #   develop:
+  #     watch:
+  #       - action: rebuild
+  #         path: ./ui/
