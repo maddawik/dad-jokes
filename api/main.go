@@ -45,7 +45,7 @@ func main() {
 	router.GET("/jokes", server.getJokes)
 	router.GET("/jokes/:id", server.getJokeByID)
 	router.POST("/jokes", server.postJoke)
-	router.Run(":8080")
+	router.Run(":42069")
 }
 
 func (s *Server) getJokeByID(c *gin.Context) {

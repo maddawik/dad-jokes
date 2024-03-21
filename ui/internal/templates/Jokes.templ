@@ -1,0 +1,16 @@
+package templates
+
+import "github.com/mawdac/go-docker-api-test/internal/store"
+
+templ Jokes(j []*store.Joke) {
+	for _, joke := range j {
+		<div class="flex justify-center mt-8 m-4">
+			<div class="max-w-md bg-white shadow-md rounded-lg overflow-hidden">
+				<div class="bg-gray-200 text-gray-600 font-bold text-sm p-2">ID: { joke.ID }</div>
+				<div class="p-6 text-center">
+					<p class="text-2xl text-gray-800">{ joke.Joke }</p>
+				</div>
+			</div>
+		</div>
+	}
+}

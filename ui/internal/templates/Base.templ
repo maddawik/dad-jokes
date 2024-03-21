@@ -1,0 +1,42 @@
+package templates
+
+templ header(title string) {
+	<head>
+		<title>{ title }</title>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<script src="static/script/htmx.min.js" nonce={ ctx.Value("htmxNonce").(string) }></script>
+		<script src="static/script/response-targets.js" nonce={ ctx.Value("responseTargetsNonse").(string) }></script>
+		<link rel="stylesheet" href="static/css/style.css" nonce={ ctx.Value("twNonce").(string) }/>
+	</head>
+}
+
+templ nav() {
+	<nav class="bg-teal-600 p-10 flex justify-center items-center text-2xl">
+		<div class="flex space-x-10">
+			<a class="text-gray-200 text-2xl hover:text-gray-100" href="/">Home</a>
+			<a class="text-gray-200 text-2xl hover:text-gray-100" href="/about">About</a>
+		</div>
+	</nav>
+}
+
+templ footer() {
+	<footer class="bg-teal-800 p-10 flex justify-center text-lg text-gray-200">
+		<span class="mr-2">Made with ❤️ by Mawdac</span>
+		<span>🦶</span>
+	</footer>
+}
+
+templ Base(contents templ.Component, title string) {
+	<!DOCTYPE html>
+	<html>
+		@header(title)
+		<body class="flex flex-col min-h-screen">
+			@nav()
+			<main class="flex-1 flex items-center justify-center bg-blue-100 text-lg">
+				@contents
+			</main>
+			@footer()
+		</body>
+	</html>
+}

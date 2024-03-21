@@ -48,7 +48,7 @@ func (djw *DadJokesWorker) start() {
 	fmt.Println(string(jokeB))
 
 	// Insert into local jokes database via API
-	apiReq, err := http.NewRequest("POST", "http://api:8080/jokes", jokeResp.Body)
+	apiReq, err := http.NewRequest("POST", "http://api:42069/jokes", jokeResp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
