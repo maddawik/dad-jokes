@@ -1,11 +1,8 @@
 #!/bin/bash
 
-echo "Downloding macos-arm64 tailwindcli binary"
-curl -OL https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-macos-arm64
-chmod +x tailwindcss-macos-arm64
-mv tailwindcss-macos-arm64 tailwindcss
+VERSION=$(gum choose linux-arm-64 linux-armv7 linux-x64 macos-arm64 macos-x64 windows-arm64.exe windows-x64.exe)
 
-echo "Downloding linux tailwindcli binary"
-curl -OL https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
-chmod +x tailwindcss-linux-x64
-mv tailwindcss-linux-x64 tailwindcss-linux
+echo "Downloding $VERSION tailwindcli binary"
+curl -OL https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-$VERSION
+chmod +x tailwindcss-$VERSION
+mv tailwindcss-$VERSION tailwindcss
