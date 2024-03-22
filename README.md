@@ -44,7 +44,7 @@ air
 ### Collectors
 
 Collects dad jokes from [the internetz](https://icanhazdadjoke.com) and writes
-it to the database via the API.
+it to the database via the API. Each time it runs, a new joke is added.
 
 ### API
 
