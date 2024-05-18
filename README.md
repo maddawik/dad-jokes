@@ -3,7 +3,7 @@
 This is a full-stack golang dad joke application. Everything you've ever
 dreamed of.
 
-![screenshot](./screenshot.png)
+![screenshot](./images/screenshot.png)
 
 It pulls dad jokes from the web, stores them in a local mongoDB instance, and
 allows you to view them from a simple UI in your browser. The UI refreshes
@@ -76,6 +76,10 @@ Server-side rendered HTML. The API that serves up the UI is written with Chi
 - [Templ](https://templ.guide/)
 - [Tailwind](https://tailwindcss.com/)
 - [HTMX](https://htmx.org/)
+
+### Diagram
+
+<img src="./images/architecture.png" alt="Architecture" style="width: 80%">
 
 ## TODO
 
